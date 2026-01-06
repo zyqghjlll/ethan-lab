@@ -1,0 +1,4 @@
+app:
+  version: 0.0.1-SNAPSHOT
+server:
+  port: 9999
