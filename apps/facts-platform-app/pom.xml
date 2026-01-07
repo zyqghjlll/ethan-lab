@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>facts-platform-app</artifactId>
-    <name>Event-based Business Facts Platform</name>
+    <name>ethan-lab facts-platform-app</name>
 
     <dependencies>
         <dependency>
@@ -21,17 +21,24 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>io.github.ethanzhang</groupId>
+            <artifactId>common</artifactId>
         </dependency>
     </dependencies>
 
@@ -40,7 +47,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>3.3.7</version>
             </plugin>
         </plugins>
     </build>
