@@ -16,7 +16,8 @@
     </parent>
 
     <modules>
-        <module>libs/common</module>
+        <module>libs/common-core</module>
+        <module>libs/common-spring-boot-starter</module>
         <module>apps/facts-platform-app</module>
     </modules>
 
@@ -25,6 +26,9 @@
         <lombok.version>1.18.34</lombok.version>
         <hutool-all.version>5.8.2</hutool-all.version>
         <common.version>0.0.1-SNAPSHOT</common.version>
+        <mybatis-plus-spring-boot3-starter.version>3.5.6</mybatis-plus-spring-boot3-starter.version>
+        <postgresql.version>42.7.4</postgresql.version>
+        <common-core.version>0.0.1-SNAPSHOT</common-core.version>
     </properties>
 
     <dependencyManagement>
@@ -44,8 +48,29 @@
 
             <dependency>
                 <groupId>io.github.ethanzhang</groupId>
-                <artifactId>common</artifactId>
+                <artifactId>common-core</artifactId>
+                <version>${common-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.ethanzhang</groupId>
+                <artifactId>common-spring-boot-starter</artifactId>
                 <version>${common.version}</version>
+            </dependency>
+
+            <!-- MyBatis-Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus-spring-boot3-starter.version}</version>
+            </dependency>
+
+            <!-- PostgreSQL -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+                <scope>runtime</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

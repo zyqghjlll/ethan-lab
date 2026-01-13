@@ -1,4 +1,4 @@
-package io.github.ethanzhang.common.web;
+package common.web;
 
 public enum ResponseConstant {
     SUCCEED("200", "Success"),

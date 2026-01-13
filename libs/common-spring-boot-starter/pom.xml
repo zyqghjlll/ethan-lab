@@ -1,0 +1,30 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.ethanzhang</groupId>
+        <artifactId>ethan-lab</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>common-spring-boot-starter</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.github.ethanzhang</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+    </dependencies>
+</project>

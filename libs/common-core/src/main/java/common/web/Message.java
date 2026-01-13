@@ -1,4 +1,4 @@
-package io.github.ethanzhang.common.web;
+package common.web;
 
 public record Message<T>(String code, String message, T data) {
     public static <T> Message<T> succeed(T data) {
