@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/facts
+    username: streamwise
+    password: streamwise
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: Hikari
+      maximum-pool-size: 10
+      auto-commit: true
+      idle-timeout: 0
+      max-lifetime: 1800000
+      connection-timeout: 300000
+      validationTimeout: 300000
+      connection-test-query: SELECT 1

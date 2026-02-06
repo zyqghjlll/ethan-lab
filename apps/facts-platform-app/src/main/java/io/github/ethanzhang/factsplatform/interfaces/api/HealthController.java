@@ -1,4 +1,4 @@
-package io.github.ethanzhang.factsplatform.interfaces;
+package io.github.ethanzhang.factsplatform.interfaces.api;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

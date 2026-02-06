@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>facts-platform-app</artifactId>
-    <name>ethan-lab facts-platform-app</name>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -38,7 +38,19 @@
 
         <dependency>
             <groupId>io.github.ethanzhang</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>common-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- MyBatis-Plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+        </dependency>
+
+        <!-- PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
 
