@@ -17,7 +17,7 @@ public class RawEventService {
                 cmd.getIngestTime()
         );
         RawEventAggRoot rawEvent = new RawEventAggRoot(rawEventId, cmd.getEventBody());
-        rawEventRepository.save(rawEvent);
-        return rawEvent.getId().toString();
+        long persistedId = rawEventRepository.save(rawEvent);
+        return String.valueOf(persistedId);
     }
 }
