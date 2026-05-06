@@ -1,13 +1,37 @@
 # ethan-lab
 
-Personal playground repo for experiments and reusable components.
+> 高并发业务系统的事件可靠性平台
+> 保证每一个订单事件从产生到处理：不丢、不重、不乱
 
-## Modules
+## 它解决什么问题
 
-- `libs/common`: shared models (e.g., Message response wrapper)
-- `apps/facts-platform-app`: Spring Boot demo app
+在高并发场景下，这些问题每天都在发生：
 
-## Build
+- 订单创建事件发出去了，消费者没收到——**消息丢失**
+- 网络抖动导致同一个事件被处理两次——**重复消费**
+- 用户先付款后取消，但系统按相反顺序处理——**顺序错乱**
 
-```bash
+ethan-lab 提供一套可直接接入的事件可靠性保障机制，
+让你不需要每个项目都重新造轮子。
+
+## 模块
+
+- `libs/common-core` 基础组件：消息封装、Auth、公共模型
+- `apps/facts-platform-app` 事件摄入服务：接收、持久化、发布事件
+
+## 当前进度
+
+- [x] 项目结构搭建
+- [x] API数据持久化
+- [ ] 事件发布机制（进行中）
+- [ ] 订单场景端到端演示
+- [ ] 消息幂等性保障
+- [ ] 消费顺序保证
+
+## 快速启动
+
 mvn -q -DskipTests clean install
+
+## 技术栈
+
+Java 17 · Spring Boot · Kafka · MySQL · DDD

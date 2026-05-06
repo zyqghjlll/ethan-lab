@@ -13,3 +13,19 @@ spring:
       connection-timeout: 300000
       validationTimeout: 300000
       connection-test-query: SELECT 1
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ethan-lab-dev
+      auto-offset-reset: earliest
+
+facts-platform:
+  messaging:
+    raw-event-topic: raw-event-ingested

@@ -1,10 +1,9 @@
 package io.github.ethanzhang.factsplatform.interfaces.api.dto;
 
 import io.github.ethanzhang.factsplatform.application.IngestRawEventCmd;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.ZoneId;
+import java.time.Instant;
 
 @Data
 public class RawEventIngestDto {
@@ -12,6 +11,7 @@ public class RawEventIngestDto {
     private String identifyKey;
     private String eventBody;
     private String zoneId;
+    private Instant ingestTime;
 
     public IngestRawEventCmd toCommand() {
         return IngestRawEventCmd.builder()
@@ -19,6 +19,7 @@ public class RawEventIngestDto {
                 .identifyKey(identifyKey)
                 .eventBody(eventBody)
                 .zoneId(zoneId)
+                .ingestTime(ingestTime)
                 .build();
     }
 }

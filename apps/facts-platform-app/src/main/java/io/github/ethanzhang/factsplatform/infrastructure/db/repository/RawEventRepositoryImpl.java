@@ -3,6 +3,7 @@ package io.github.ethanzhang.factsplatform.infrastructure.db.repository;
 import common.utils.IdGenerator;
 import io.github.ethanzhang.factsplatform.domain.rawevent.RawEventAggRoot;
 import io.github.ethanzhang.factsplatform.domain.rawevent.RawEventRepository;
+import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventEntity;
 import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventIdentify;
 import io.github.ethanzhang.factsplatform.infrastructure.db.mapper.RawEventMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +17,19 @@ public class RawEventRepositoryImpl implements RawEventRepository {
     private final IdGenerator idGenerator;
 
     @Override
-    public void save(RawEventAggRoot event) {
+    public long save(RawEventAggRoot event) {
+        long rawEventId = idGenerator.generateSequence();
+
         RawEventIdentify rawEventIdentify = new RawEventIdentify();
-        rawEventIdentify.setRawEventId(idGenerator.generateSequence());
+        rawEventIdentify.setRawEventId(rawEventId);
         rawEventIdentify.setSource(event.getSource());
         rawEventIdentify.setIdentifyKey(event.getIdentifyKey());
         rawEventIdentify.setZoneId(event.getZoneId());
         rawEventIdentify.setIngestTime(event.getIngestTime());
         rawEventIdentify.setTimelineSequenceId(1L);
 
-        rawEventMapper.insert(rawEventIdentify);
+        rawEventMapper.insertIdentify(rawEventIdentify);
+        rawEventMapper.insertRawEvent(new RawEventEntity(rawEventId, event.getEventBody()));
+        return rawEventId;
     }
 }
