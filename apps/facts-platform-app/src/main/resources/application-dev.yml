@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/facts
-    username: streamwise
-    password: streamwise
+    url: jdbc:postgresql://localhost:5432/dev_db
+    username: admin
+    password: admin123
     driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: Hikari
@@ -23,8 +23,12 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
-      group-id: ethan-lab-dev
+      group-id: ethan-lab-consumer
       auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: io.github.ethanzhang.factsplatform.application.ports.EventMessage
 
 facts-platform:
   messaging:

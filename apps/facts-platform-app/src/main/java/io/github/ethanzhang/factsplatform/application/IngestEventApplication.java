@@ -1,12 +1,13 @@
 package io.github.ethanzhang.factsplatform.application;
 
+import io.github.ethanzhang.factsplatform.application.ports.EventMessage;
 import io.github.ethanzhang.factsplatform.application.ports.EventPublisher;
 import io.github.ethanzhang.factsplatform.domain.rawevent.RawEventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class IngestEventApplication {
     @Transactional
     public IngestRawEventReport ingest(IngestRawEventCmd cmd) {
         if (cmd.getIngestTime() == null) {
-            cmd.setIngestTime(Instant.now());
+            cmd.setIngestTime(LocalDateTime.now());
         }
 
         // timeline
@@ -29,7 +30,8 @@ public class IngestEventApplication {
 
 
         // add to queue
-        eventPublisher.publish(id, cmd.getEventBody());
+        EventMessage message = new EventMessage(id, "", "test", cmd.getEventBody(), 1L);
+        eventPublisher.publish(message);
 
         return new IngestRawEventReport(id);
     }

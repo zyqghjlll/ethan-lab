@@ -5,15 +5,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
-@TableName("raw_event")
+@TableName("raw_event_content")
 @NoArgsConstructor
-public class RawEventEntity {
+public class RawEventContent {
     @TableId
     private long rawEventId;
     private String eventBody;
+    private LocalDateTime createdAt;
 
-    public RawEventEntity(long rawEventId, String eventBody) {
+    public RawEventContent(long rawEventId, String eventBody) {
         this.rawEventId = rawEventId;
         this.eventBody = eventBody;
     }

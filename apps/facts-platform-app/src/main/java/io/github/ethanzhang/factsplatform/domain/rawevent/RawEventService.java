@@ -12,6 +12,7 @@ public class RawEventService {
     public String ingest(IngestRawEventCmd cmd) {
         RawEventId rawEventId = new RawEventId(
                 cmd.getSource(),
+                cmd.getEventType(),
                 cmd.getIdentifyKey(),
                 cmd.getZoneId(),
                 cmd.getIngestTime()

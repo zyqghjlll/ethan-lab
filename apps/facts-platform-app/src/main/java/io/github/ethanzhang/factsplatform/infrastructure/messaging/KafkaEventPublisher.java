@@ -1,5 +1,6 @@
 package io.github.ethanzhang.factsplatform.infrastructure.messaging;
 
+import io.github.ethanzhang.factsplatform.application.ports.EventMessage;
 import io.github.ethanzhang.factsplatform.application.ports.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ public class KafkaEventPublisher implements EventPublisher {
     private String rawEventTopic;
 
     @Override
-    public void publish(String eventId, String eventBody) {
-        kafkaTemplate.send(rawEventTopic, eventId, eventBody);
+    public void publish(EventMessage eventMessage) {
+        kafkaTemplate.send(rawEventTopic, eventMessage.eventId(), eventMessage);
     }
 }
