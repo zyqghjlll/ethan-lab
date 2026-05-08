@@ -1,7 +1,7 @@
 package io.github.ethanzhang.factsplatform.domain.rawevent;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-public record RawEventId(String source, String identifyKey, String zoneId, Instant ingestTime) {
+public record RawEventId(String source, String eventType, String identifyKey, String zoneId, LocalDateTime ingestTime) {
 
 }

@@ -1,11 +1,11 @@
 package io.github.ethanzhang.factsplatform.infrastructure.db.mapper;
 
-import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventEntity;
-import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventIdentify;
+import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventContent;
+import io.github.ethanzhang.factsplatform.infrastructure.db.entity.RawEventMeta;
 import org.apache.ibatis.annotations.Param;
 
 public interface RawEventMapper {
-    void insertIdentify(@Param("entity") RawEventIdentify entity);
+    void insertMeta(@Param("entity") RawEventMeta entity);
 
-    void insertRawEvent(@Param("entity") RawEventEntity entity);
+    void insertContent(@Param("entity") RawEventContent entity);
 }

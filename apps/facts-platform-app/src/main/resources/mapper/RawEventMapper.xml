@@ -5,33 +5,31 @@
 
 <mapper namespace="io.github.ethanzhang.factsplatform.infrastructure.db.mapper.RawEventMapper">
 
-    <insert id="insertIdentify">
-        insert into raw_event_identify (
+    <insert id="insertMeta">
+        INSERT INTO raw_event_meta (
             raw_event_id,
             source,
+            event_type,
             identify_key,
             zone_id,
-            ingest_time,
-            timeline_sequence_id
-        )
-        values (
-            #{entity.rawEventId},
-            #{entity.source},
-            #{entity.identifyKey},
-            #{entity.zoneId},
-            #{entity.ingestTime},
-            #{entity.timelineSequenceId}
-        );
+            ingest_time
+        ) VALUES (
+                     #{entity.rawEventId},
+                     #{entity.source},
+                     #{entity.eventType},
+                     #{entity.identifyKey},
+                     #{entity.zoneId},
+                     #{entity.ingestTime}
+                 )
     </insert>
 
-    <insert id="insertRawEvent">
-        insert into raw_event (
+    <insert id="insertContent">
+        INSERT INTO raw_event_content (
             raw_event_id,
             event_body
-        )
-        values (
-            #{entity.rawEventId},
-            #{entity.eventBody}
-        );
+        ) VALUES (
+                     #{entity.rawEventId},
+                     #{entity.eventBody}
+                 )
     </insert>
 </mapper>

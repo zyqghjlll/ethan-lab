@@ -5,17 +5,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.Instant;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 
 @Data
-@TableName("raw_event_identify")
-public class RawEventIdentify {
+@TableName("raw_event_meta")
+public class RawEventMeta {
     @TableId
     private long rawEventId;
     private String source;
+    private String eventType;
     private String identifyKey;
     private String zoneId;
-    private Instant ingestTime;
-    private long randomNumber;
-    private long timelineSequenceId;
+    private LocalDateTime ingestTime;
+    private LocalDateTime createdAt;
 }
