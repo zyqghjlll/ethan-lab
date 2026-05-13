@@ -5,6 +5,7 @@ import io.github.ethanzhang.factsplatform.application.IngestEventApplication;
 import io.github.ethanzhang.factsplatform.application.IngestRawEventReport;
 import io.github.ethanzhang.factsplatform.interfaces.api.dto.RawEventIngestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,8 +15,8 @@ public class IngestEventController {
 
     private final IngestEventApplication ingestEventApplication;
 
-    @PostMapping("ingest")
-    public Message<IngestRawEventReport> ingestEvent(@RequestBody RawEventIngestDto event) {
+    @PostMapping("/ingest")
+    public Message<IngestRawEventReport> ingestEvent(@RequestBody @Validated RawEventIngestDto event) {
         IngestRawEventReport report = ingestEventApplication.ingest(event.toCommand());
         return Message.succeed(report);
     }

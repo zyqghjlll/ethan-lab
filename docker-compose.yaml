@@ -74,6 +74,12 @@ services:
     container_name: dev-prometheus
     ports:
       - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - dev-network
 
