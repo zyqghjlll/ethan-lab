@@ -35,9 +35,8 @@ public class IngestEventApplication {
 
         // 模拟30%概率发布失败
         if (Math.random() < 0.3) {
-            meterRegistry.counter("app_kafka_publish_total").increment();
-            // 不实际发送
-            return new IngestRawEventReport(id);
+            meterRegistry.counter("app_kafka_publish_failed_total").increment();
+            throw new RuntimeException("Simulated publish failure");
         }
 
         // add to queue
