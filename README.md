@@ -1,6 +1,6 @@
 # ethan-lab
 
-> A multi-tenant, event-driven platform for personal growth tracking — built on a reliable Kafka backbone with full observability and AI-powered behavioral analysis.
+> A lab for practicing engineering **judgment** on an event-driven backend: how to define correctness, how to make failures observable, and how to decide what to build — and what to deliberately leave bare.
 
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)](https://spring.io/projects/spring-boot)
@@ -8,147 +8,114 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-database-blue)](https://www.postgresql.org/)
 [![Prometheus](https://img.shields.io/badge/Prometheus-metrics-red)](https://prometheus.io/)
 [![Grafana](https://img.shields.io/badge/Grafana-dashboards-yellow)](https://grafana.com/)
-[![Docker](https://img.shields.io/badge/Docker-containerized-blue)](https://www.docker.com/)
 
 ---
 
-## What problem does this solve?
+## What this is
 
-Most productivity tools track what you *plan* to do. **ethan-lab** tracks what you *actually* did — and uses AI to tell you what it means.
+ethan-lab is not a product. It's a working lab where I sharpen the part of
+engineering that doesn't show up in a framework tutorial: **deciding what
+"correct" means, proving it, and judging what's worth building.**
 
-It is a multi-tenant event-driven platform for personal growth tracking. Users record daily actions as events. The system reliably ingests them through a Kafka-backed pipeline, persists them, and asynchronously triggers AI analysis to surface behavioral patterns, risks, and trajectory projections.
+The business scenario is intentionally as small as possible — **ingest
+messages**: receive a message, persist it, publish it, consume it. Nothing more.
+A simple scenario is a feature here, not a limitation: it keeps the spotlight on
+the method, not on business complexity.
 
-The core question it answers: *given how I actually behave today, where am I headed?*
+The method is deliberate:
+
+1. Define correctness precisely — as conservation laws and a per-event state machine.
+2. Load-test until something violates the definition.
+3. Keep the implementation bare on purpose, so problems surface instead of being pre-empted.
+4. Understand the failure, then decide the fix.
+
+The interesting part isn't any single fix. It's building checks that catch
+**any** violation of correctness — whether or not I foresaw the cause — and
+knowing exactly where my local implementation stops and a production one would
+begin.
+
+→ **Why this method works:** [docs/why-this-method.md](docs/why-this-method.md)
+→ **What "correct" means here:** [docs/message-pipeline-correctness.md](docs/message-pipeline-correctness.md)
 
 ---
 
-## Architecture
+## The pipeline
 
-The system separates high-frequency event ingestion from slow AI processing into two independent pipelines.
-
-Incoming user events are written to a `user-events` Kafka topic with guaranteed delivery and idempotent deduplication. A consumer persists events to PostgreSQL in real time. A scheduled job aggregates each user's daily events and publishes one analysis task per user to an `ai-analysis-jobs` topic. A second consumer processes these tasks at a controlled rate, calls the AI API, and writes results back to the database.
-
-Users bring their own AI API key. Keys are AES-encrypted at rest. This keeps data sovereign to each user and eliminates platform-level API costs.
+A small asynchronous pipeline running locally on Docker Compose:
 
 ```
-User writes daily event
-        │
-        ▼
-┌───────────────────┐
-│  REST API Layer   │
-└────────┬──────────┘
-         │
-         ▼
-┌───────────────────┐        ┌─────────────────────┐
-│  Kafka Topic:     │        │  Consumer A          │
-│  user-events      │───────▶│  Persist to          │
-│  (high frequency) │        │  PostgreSQL           │
-└───────────────────┘        └─────────────────────┘
-                                        │
-                              Scheduled daily aggregation
-                                        │
-                                        ▼
-┌───────────────────┐        ┌─────────────────────┐
-│  Kafka Topic:     │        │  Consumer B          │
-│  ai-analysis-jobs │◀───────│  Rate-limited        │
-│  (low frequency)  │        │  AI API caller        │
-└───────────────────┘        └─────────────────────┘
-         │
-         ▼
-  AI Analysis Result
-  written to PostgreSQL
-         │
-         ▼
-┌───────────────────┐
-│  Prometheus +     │
-│  Grafana          │
-│  (observability)  │
-└───────────────────┘
+HTTP → PostgreSQL → Kafka → Consumer
 ```
 
----
+Driven by k6 load tests, watched through Prometheus + Grafana. Idempotency is
+currently an in-memory check — deliberately bare, so that correctness laws can
+expose what a naive implementation misses (e.g. why an outbox is eventually
+needed) rather than hiding it behind a mechanism added too early.
 
-## Why this design?
-
-Three decisions shaped this architecture.
-
-**Decouple AI calls from the write path.** AI APIs are slow and rate-limited. Triggering analysis synchronously on every event write would bottleneck ingestion. A separate `ai-analysis-jobs` topic lets the write path stay fast and the AI path retry safely on failure with exponential backoff and dead-letter handling.
-
-**Correctness over throughput.** In a reliability platform, processing the same event twice is worse than processing it late. The idempotent deduplication layer — backed by a database unique constraint — prioritizes correctness. Concurrent duplicate writes are caught at the database level, not just in application logic.
-
-**Observability is first-class.** Prometheus metrics track event write latency, Kafka consumer lag, AI call success rate, duplicate detection rate, and dead-letter queue depth. Grafana dashboards make system health visible at a glance — because a platform you cannot observe is a platform you cannot trust.
+This is verification for a **local, manually-driven** setup. Production-grade
+reconciliation (incremental, continuous) is different machinery at scale —
+documented as such, not pretended.
 
 ---
 
-## Multi-tenant design
+## What's being demonstrated
 
-Each event carries a `userId`. Load tests simulate 1,000 concurrent users writing events simultaneously. Kafka partitions by `userId` to preserve per-user ordering. The idempotency layer operates per-user to prevent cross-tenant interference.
+Less "I can wire up Kafka," more:
 
-Users supply their own AI API key via settings. Keys are AES-encrypted before storage. This means:
-- The platform bears zero AI API cost
-- User data is analyzed using their own credentials
-- Data sovereignty stays with the user
+- **Defining correctness** as checkable conservation laws (no loss, no wrong duplication), separating the aggregate view from the per-event state machine, and knowing why `distinct` keys — not totals — are the right unit.
+- **Making correctness observable** — Grafana displays the verdict; it doesn't compute it. The judgment lives in the counter arithmetic or the reconciliation query.
+- **Deciding scope** — what to build now, what to leave bare to surface problems, and where the local approach diverges from production.
+- **Reasoning in the open** — `/docs` holds the reasoning behind each choice, including a written defense of the method itself after I doubted it.
 
 ---
 
-## Observability
+## Docs
 
-| Metric | Description |
+| Doc | What it covers |
 |---|---|
-| `event_write_latency_ms` | End-to-end write latency per event |
-| `kafka_consumer_lag` | Consumer lag per topic and partition |
-| `ai_call_success_rate` | AI API call success/failure ratio |
-| `duplicate_detection_count` | Idempotent deduplication hits |
-| `dlq_depth` | Dead-letter queue depth |
+| [`why-this-method.md`](docs/why-this-method.md) | Why bare-implementation + correctness checks is a valid way to surface problems — written as a doubt resolved, not a claim asserted |
+| [`message-pipeline-correctness.md`](docs/message-pipeline-correctness.md) | The correctness model: conservation laws + per-event state machine |
+| [`where correctness can be judged.md`](docs/where%20correctness%20can%20be%20judged.md) | Why Prometheus/Redis detach from truth under crashes and code change; why only state inside the DB's transaction boundary is a stable foundation; CDC vs outbox; the verdict/sentinel separation and what Grafana is actually for |
+| [`architecture.md`](docs/architecture.md) | Persistence and write-path trade-offs |
+| [`practice-goals.md`](docs/practice-goals.md) | The practice goals behind the platform: high-concurrency ingestion, fact-centric modeling, idempotency, CQRS, observability, and evolutionary architecture |
+| [`debugging-kafka-broker-stale-znode.md`](docs/debugging-kafka-broker-stale-znode.md) | Debugging a Kafka broker that wouldn't start after inactivity — stale ZooKeeper znode root cause and fix |
 
-Grafana dashboards are pre-configured in `/docker/grafana`.
-
----
-
-## Modules
-
-| Module | Description |
-|---|---|
-| `libs/common-core` | Shared: message contracts, auth, common models |
-| `apps/facts-platform-app` | Event ingestion service: receive, persist, publish |
+`/docs` is closer to a set of architecture decision records than feature docs —
+the reasoning, not just the result.
 
 ---
 
 ## Tech stack
 
-Java 21 · Spring Boot 3 · Apache Kafka · PostgreSQL · Redis · Docker · Prometheus · Grafana · k6 (load testing)
+Java 21 · Spring Boot 3 · Apache Kafka · PostgreSQL · Docker · Prometheus · Grafana · k6
 
 ---
 
 ## Quick start
 
 ```bash
-# Start infrastructure
 docker-compose up -d
-
-# Build and run
 mvn -q -DskipTests clean install
 ```
 
 ---
 
-## Progress
+## Status
 
-- [x] Project structure
-- [x] API layer and persistence
-- [x] Kafka event publishing
-- [x] Idempotent consumption
-- [ ] Multi-tenant load test (k6, in progress)
-- [ ] AI analysis pipeline
-- [ ] User API key management
-- [ ] Grafana dashboard templates
+Real, now:
+- [x] Message ingestion: REST → persist → publish
+- [x] Kafka consumer with in-memory idempotency (deliberately bare)
+- [x] k6 load tests
+- [x] First-pass Grafana dashboard
+- [x] Correctness model defined (laws + state machine)
+- [x] Law 1 (ingress conservation) check + Grafana residual panel
+
+Roadmap — all method-driven, listed as intent, not achievement:
+- [ ] Law 2 / Law 3 correctness checks
+- [ ] Outbox / Inbox — added when a correctness check exposes the need, not before
+- [ ] Per-run metric isolation
+- [ ] Grafana auto-provisioning on `docker-compose up`
 
 ---
 
-## Notes
-
-`/docs` contains architecture decision records (ADRs) — the reasoning behind key design choices, not just what was built.
-
----
-
-*Built by a senior backend engineer with 12+ years of experience in distributed systems, as both a technical showcase and a tool used daily for personal growth tracking.*
+*Built by a backend engineer with 12+ years in distributed systems — as a place to practice and show how I think about correctness, observability, and what's worth building.*
