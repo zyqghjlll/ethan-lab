@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class RawEventService {
     private final RawEventRepository rawEventRepository;
 
-    public String ingest(IngestRawEventCmd cmd) {
+    public String ingest(IngestRawEventCmd cmd) throws InterruptedException {
         RawEventId rawEventId = new RawEventId(
                 cmd.getSource(),
                 cmd.getEventType(),
@@ -19,6 +19,10 @@ public class RawEventService {
         );
         RawEventAggRoot rawEvent = new RawEventAggRoot(rawEventId, cmd.getEventBody());
         long persistedId = rawEventRepository.save(rawEvent);
+
+        // Intention mocking more time to take.
+        Thread.sleep(50);
+
         return String.valueOf(persistedId);
     }
 }
