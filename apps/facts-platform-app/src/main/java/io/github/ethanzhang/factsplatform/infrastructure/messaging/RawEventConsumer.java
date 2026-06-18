@@ -41,7 +41,7 @@ public class RawEventConsumer {
 
         processedIds.add(eventId);
 
-        Thread.sleep(100);
+        // Thread.sleep(100);
         meterRegistry.counter("app_kafka_consume_total").increment();
         // add idempotency check here next
     }
