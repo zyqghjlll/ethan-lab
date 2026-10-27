@@ -7,6 +7,11 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     container_name: dev-zookeeper
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
+    volumes:
+      - ./data/zookeeper/data:/var/lib/zookeeper/data
+      - ./data/zookeeper/log:/var/lib/zookeeper/log
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -18,8 +23,13 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.3.2
     container_name: dev-kafka
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_started
+    volumes:
+      - ./data/kafka:/var/lib/kafka/data
     ports:
       - "9092:9092"
     environment:
@@ -36,6 +46,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     container_name: dev-kafka-ui
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
@@ -49,6 +60,8 @@ services:
   postgres:
     image: postgres:15
     container_name: dev-postgres
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
     ports:
       - "5432:5432"
     environment:
@@ -56,15 +69,20 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: dev_db
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./data/postgres:/var/lib/postgresql/data
     networks:
       - dev-network
 
   redis:
     image: redis:7
     container_name: dev-redis
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
     ports:
       - "6379:6379"
+    volumes:
+      - ./data/redis:/data
     command: ["redis-server", "--appendonly", "yes"]
     networks:
       - dev-network
@@ -72,10 +90,13 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: dev-prometheus
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
     ports:
       - "9090:9090"
     volumes:
-      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./data/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     extra_hosts:
@@ -86,9 +107,14 @@ services:
   grafana:
     image: grafana/grafana
     container_name: dev-grafana
+    restart: unless-stopped
+    user: "${LOCAL_UID:?Run scripts/prepare-local-data.sh first}:0"
     ports:
       - "3000:3000"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
     depends_on:
-      - prometheus
+      prometheus:
+        condition: service_started
     networks:
       - dev-network

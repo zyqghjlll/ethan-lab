@@ -38,3 +38,8 @@ structure.txt
 
 ### mvn ###
 .mvn/
+
+# Local service databases, dashboards, and migration backups
+/data/
+/backups/
+/.env
