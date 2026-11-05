@@ -93,7 +93,10 @@ Java 21 · Spring Boot 3 · Apache Kafka · PostgreSQL · Docker · Prometheus �
 
 ## Quick start
 
+Service data is persisted under `./data/` (excluded from Git). **Existing installations must [migrate their current data before recreating containers](docs/local-data.md).**
+
 ```bash
+./scripts/prepare-local-data.sh
 docker-compose up -d
 mvn -q -DskipTests clean install
 ```
