@@ -1,6 +1,8 @@
 package io.github.ethanzhang.factsplatform.infrastructure.messaging;
 
 import io.github.ethanzhang.factsplatform.application.ports.EventMessage;
+import io.github.ethanzhang.factsplatform.infrastructure.client.ClassificationClient;
+import io.github.ethanzhang.factsplatform.infrastructure.client.classify.ClassificationResult;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,6 +23,8 @@ public class RawEventConsumer {
 
     private final Set<String> processedIds = ConcurrentHashMap.newKeySet();
 
+    private final ClassificationClient classificationClient;
+
     @SneakyThrows
     @KafkaListener(
             topics = "${facts-platform.messaging.raw-event-topic:raw-event-ingested}",
@@ -40,6 +44,8 @@ public class RawEventConsumer {
         }
 
         processedIds.add(eventId);
+
+        ClassificationResult classificationResult = classificationClient.getClassificationResult(eventId + "|" + eventMessage.eventBody());
 
         // Thread.sleep(100);
         meterRegistry.counter("app_kafka_consume_total").increment();
